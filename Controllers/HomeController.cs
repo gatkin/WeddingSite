@@ -15,7 +15,12 @@ namespace WeddingSite.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Rsvp()
+        {
+            return View();
+        }
+
+        public IActionResult Photos()
         {
             return View();
         }
