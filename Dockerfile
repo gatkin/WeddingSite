@@ -10,7 +10,17 @@ RUN dotnet publish -c Release -o out
 
 # Build the runtime image
 FROM microsoft/dotnet:aspnetcore-runtime
-EXPOSE 80
+
 WORKDIR /app
 COPY --from=build-env /app/out .
-ENTRYPOINT [ "dotnet", "WeddingSite.dll" ]
+
+# Create an app user so our program doesn't run as root.
+# RUN groupadd -r app &&\
+#     useradd -r -g app -d /home/app -s /sbin/nologin -c "Docker image user" app
+# RUN chown -R app:app /app
+# USER app
+
+#EXPOSE $PORT
+#ENV ASPNETCORE_URLS="http://*:$PORT"
+
+CMD dotnet WeddingSite.dll --urls=http://*:$PORT

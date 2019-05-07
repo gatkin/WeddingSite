@@ -17,8 +17,16 @@ namespace WeddingSite
             CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            Console.WriteLine("*****args = " + string.Join(',', args));
+            var config = new ConfigurationBuilder()
+                .AddCommandLine(args)
+                .Build();
+
+            return WebHost.CreateDefaultBuilder(args)
+                    .UseConfiguration(config)
+                    .UseStartup<Startup>();
+        }
     }
 }
