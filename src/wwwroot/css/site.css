@@ -44,6 +44,7 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
+  background-color: #eff0f2;
 }
 .footer {
   position: absolute;
@@ -53,4 +54,25 @@ body {
   /* Set the fixed height of the footer here */
   height: 60px;
   line-height: 60px; /* Vertically center the text there */
+}
+
+.main-container {
+  padding: 0;
+}
+
+#hero-image {
+  width: 100%;
+}
+
+#hero-image-col {
+  padding: 0;
+  position: relative;
+}
+
+#image-text {
+  position: absolute;
+  color: white;
+  top: 20%;
+  left: 70%;
+  text-align: center;
 }
