@@ -73,6 +73,21 @@ body {
   position: absolute;
   color: white;
   top: 20%;
-  left: 70%;
+  left: 60%;
   text-align: center;
+}
+
+#image-title {
+  font-size: 4.2em;
+}
+
+#details-row {
+  height: 40em;
+}
+
+#details {
+  position: absolute;
+  top: 50%;
+  text-align: center;
+  vertical-align: middle;
 }
