@@ -4,15 +4,15 @@ WORKDIR /app
 
 # Copy csproj and restore as distinct layers
 COPY ./src ./
-RUN dotnet restore
-RUN dotnet build -c Release
-RUN dotnet publish -c Release -o out
+RUN dotnet restore WeddingSite.Web
+RUN dotnet build --configuration Release WeddingSite.Web
+RUN dotnet publish --configuration Release -o out WeddingSite.Web
 
 # Build the runtime image
 FROM microsoft/dotnet:aspnetcore-runtime
 
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=build-env /app/WeddingSite.Web/out .
 
 # Create an app user so our program doesn't run as root.
 RUN groupadd -r app &&\
@@ -20,4 +20,4 @@ RUN groupadd -r app &&\
 RUN chown -R app:app /app
 USER app
 
-CMD dotnet WeddingSite.dll --urls=http://*:$PORT
+CMD dotnet WeddingSite.Web.dll --urls=http://*:$PORT
