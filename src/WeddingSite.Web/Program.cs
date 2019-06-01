@@ -19,7 +19,6 @@ namespace WeddingSite
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-            Console.WriteLine("*****args = " + string.Join(',', args));
             var config = new ConfigurationBuilder()
                 .AddCommandLine(args)
                 .Build();

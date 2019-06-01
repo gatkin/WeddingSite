@@ -1,8 +1,12 @@
 TAG=wedding-site
 PORT=5005
+WEB_DIRECTORY=src/WeddingSite.Web
 
-build:
+build-docker: build-elm
 	docker build --tag=${TAG} .
+
+build-elm:
+	elm make $(WEB_DIRECTORY)/Views/Rsvp/Rsvp.elm --output=$(WEB_DIRECTORY)/wwwroot/elm/rsvp.elm.js
 
 heroku-deploy: heroku-push
 	heroku container:release web
