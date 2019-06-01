@@ -15,3 +15,6 @@ heroku-push: heroku-init
 
 run: build
 	docker run -e PORT=${PORT} -p ${PORT}:${PORT} ${TAG}:latest
+
+watch:
+	dotnet watch --project src/WeddingSite.Web/WeddingSite.Web.csproj run
