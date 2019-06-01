@@ -330,3 +330,5 @@ ASALocalRun/
 .mfractor/
 
 .DS_Store
+elm-stuff/
+src/WeddingSite.Web/wwwroot/elm/
