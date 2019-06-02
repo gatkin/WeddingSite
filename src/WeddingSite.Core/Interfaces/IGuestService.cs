@@ -6,6 +6,6 @@ namespace WeddingSite.Core
     {
         IEnumerable<Guest> GetAllGuests();
 
-        IEnumerable<(Guest, Guest)> GetAllPlusOnePairs();
+        IEnumerable<PlusOnePair> GetAllPlusOnePairs();
     }
 }

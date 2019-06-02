@@ -23,9 +23,37 @@ namespace WeddingSite.Controllers
             return View();
         }
 
-        public IEnumerable<Guest> Guests()
+        public GuestListResponse Guests()
         {
-            return GuestService.GetAllGuests();
+            var guests = GuestService.GetAllGuests();
+            var plusOnes = GuestService.GetAllPlusOnePairs();
+
+            var guestModels = from guest in guests
+                              select new GuestModel{ Id = guest.Id, Name = guest.Name };
+            
+            var plusOneModels = from pair in plusOnes
+                                select new PlusOneModel
+                                {
+                                    PartnerAName = GetGuestNameById(guests, pair.PartnerAId),
+                                    PartnerBName = GetGuestNameById(guests, pair.PartnerBId),
+                                };
+            
+            return new GuestListResponse
+            {
+                Guests = guestModels,
+                PlusOnes = plusOneModels,
+            };
+        }
+
+        [HttpPost]
+        public AttendanceRequest Attendance([FromBody]AttendanceRequest request)
+        {
+            return request;
+        }
+
+        private static string GetGuestNameById(IEnumerable<Guest> guests, int id)
+        {
+            return guests.Single(guest => guest.Id == id).Name;
         }
     }
 }
