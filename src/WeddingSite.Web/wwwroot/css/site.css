@@ -91,3 +91,21 @@ body {
   text-align: center;
   vertical-align: middle;
 }
+
+#search-bar-row {
+  margin: 0.8em;
+}
+
+#title-row {
+  margin: 1em;
+}
+
+#guest-list-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.guest-name {
+  margin: 0.5em;
+}
