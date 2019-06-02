@@ -1,9 +1,10 @@
 import Browser
-import Html exposing (Html, button, div, h1, input, text)
+import Html exposing (Html, button, div, h1, input, span, text)
 import Html.Attributes exposing (class, disabled, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode exposing (Decoder, field, int, list, string)
+import Json.Encode as Encode
 import Set exposing (Set)
 
 
@@ -69,6 +70,7 @@ type Msg = GuestListLoaded (Result Http.Error GetGuestListReponse)
   | NewSearch String
   | AttendingSubmitted
   | NotAttendingSubmitted
+  | RsvpSubmitted (Result Http.Error ())
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -85,8 +87,10 @@ update msg model =
     NewSearch searchString ->
       (onNewSearch searchString model, Cmd.none)
     AttendingSubmitted ->
-      (model, Cmd.none)
+      onRsvpSubmitted True model
     NotAttendingSubmitted ->
+      onRsvpSubmitted False model
+    RsvpSubmitted result ->
       (model, Cmd.none)
 
 
@@ -170,6 +174,11 @@ doesGuestMatchSearchString searchString matchingPlusOneNames guest =
   || Set.member guest.name matchingPlusOneNames
 
 
+onRsvpSubmitted : Bool -> Model -> (Model, Cmd Msg)
+onRsvpSubmitted isAttending model =
+    (model, postRsvpRequest isAttending model.guests)
+
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
@@ -245,8 +254,10 @@ submitButtonView guestList =
     div [ class "submit-button-row row" ]
     [ div [ class "col-4" ] []
     , div [ class "col-4", id "submit-button-container" ]
-      [ button [ class "submit-button btn btn-success", type_ "button", disabled disableButtons, onClick AttendingSubmitted ] [ text "Attending" ]
-      , button [ class "submit-button btn btn-danger", type_ "button", disabled disableButtons, onClick NotAttendingSubmitted ] [ text "Not Attending" ]
+      [ button [ class "submit-button btn btn-success", type_ "button", disabled disableButtons, onClick AttendingSubmitted ]
+        [ text "Attending" ]
+      , button [ class "submit-button btn btn-danger", type_ "button", disabled disableButtons, onClick NotAttendingSubmitted ]
+        [ span [ class "spinner-border spinner-border-sm" ] [],  text "Not Attending" ]
       ]
     , div [ class "col-4" ] []
     ]
@@ -281,3 +292,26 @@ plusOneResponseModelDecoder =
   Json.Decode.map2 PlusOneResponseModel
     (field "partnerAName" string)
     (field "partnerBName" string)
+
+
+postRsvpRequest : Bool -> List Guest -> Cmd Msg
+postRsvpRequest isAttending guests =
+  let
+    selectedGuestIds = getSelectedGuestIds guests
+    jsonRequest = Encode.object
+      [ ( "GuestIds", Encode.list Encode.int selectedGuestIds )
+      , ( "IsAttending", Encode.bool isAttending )
+      ]
+  in
+    Http.post
+      { url = "/Rsvp/Attendance"
+      , body = Http.jsonBody jsonRequest
+      , expect = Http.expectWhatever RsvpSubmitted
+      }
+
+
+getSelectedGuestIds : List Guest -> List GuestId
+getSelectedGuestIds guests =
+  guests
+    |> List.filter (\guest -> guest.isSelected && guest.isVisible)
+    |> List.map (\guest -> guest.id)

@@ -6,6 +6,6 @@ namespace WeddingSite.Models
     {
         public IEnumerable<int> GuestIds { get; set; }
 
-        public bool Attending { get; set; }
+        public bool IsAttending { get; set; }
     }
 }
