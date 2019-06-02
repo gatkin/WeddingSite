@@ -2,11 +2,13 @@ import Browser
 import Html exposing (Html, button, div, h1, input, text)
 import Html.Attributes exposing (class, disabled, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
+import Http
+import Json.Decode exposing (Decoder, field, int, list, string)
 import Set exposing (Set)
 
 
 main =
-  Browser.sandbox { init = init, update = update, view = view }
+  Browser.element { init = init, update = update, subscriptions = subscriptions, view = view }
 
 
 -- MODEL
@@ -28,31 +30,20 @@ type alias Guest =
 
 type alias PlusOnePair = (String, String)
 
-initialPlusOnes : List PlusOnePair
-initialPlusOnes =
-  [ ("John Doe", "Jane Doe")
-  , ("Philip J Fry", "Turanga Leela")
-  , ("Amy Wang", "Kif Kroker")
-  ]
+type alias GuestResponseModel =
+  { id: GuestId
+  , name: String
+  }
 
-createGuest : String -> Int -> Guest
-createGuest name guestId =
-  { id = guestId, name = name, status = Unregistered, isSelected = False, isVisible = True }
+type alias PlusOneResponseModel =
+  { partnerAName: String
+  , partnerBName: String
+  }
 
-initialGuests : List Guest
-initialGuests =
-  [ createGuest "John Doe" 1
-  , createGuest "Jane Doe" 2
-  , createGuest "Philip J Fry" 3
-  , createGuest "Turanga Leela" 4
-  , createGuest "Zapp Brannigan" 5
-  , createGuest "Kif Kroker" 6
-  , createGuest "Hermes Conrad" 7
-  , createGuest "Bender Bending Rodrigez" 8
-  , createGuest "Amy Wang" 9
-  , createGuest "Zoidberg" 10
-  ]
-
+type alias GetGuestListReponse =
+  { guests: List GuestResponseModel
+  , plusOnes: List PlusOneResponseModel
+  }
 
 type alias Model =
   { guests: List Guest
@@ -61,27 +52,61 @@ type alias Model =
   }
 
 
-init : Model
-init =
-  { guests = initialGuests
-  , plusOnes = initialPlusOnes
-  , searchString = ""
-  }
+init : () -> (Model, Cmd Msg)
+init () =
+  ( { guests = []
+    , plusOnes = []
+    , searchString = ""
+    }
+  , getGuestList
+  ) 
 
 
 -- UPDATE
 
-type Msg = SelectGuest GuestId
+type Msg = GuestListLoaded (Result Http.Error GetGuestListReponse)
+  | SelectGuest GuestId
   | NewSearch String
+  | AttendingSubmitted
+  | NotAttendingSubmitted
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+    GuestListLoaded result ->
+      case result of
+        Ok response ->
+          (onGuestListLoaded response model, Cmd.none)
+        Err _ ->
+          (model, Cmd.none)
     SelectGuest guestId ->
-      onGuestSelected guestId model
+      (onGuestSelected guestId model, Cmd.none)
     NewSearch searchString ->
-      onNewSearch searchString model
+      (onNewSearch searchString model, Cmd.none)
+    AttendingSubmitted ->
+      (model, Cmd.none)
+    NotAttendingSubmitted ->
+      (model, Cmd.none)
+
+
+onGuestListLoaded : GetGuestListReponse -> Model -> Model
+onGuestListLoaded response model =
+  let
+      guests = response.guests |> List.map guestResponseModelToGuest
+      plusOnes = response.plusOnes |> List.map plusOneResponseModelToPlusOnePair
+  in
+    { model | guests = guests, plusOnes = plusOnes }
+  
+
+guestResponseModelToGuest : GuestResponseModel -> Guest
+guestResponseModelToGuest model =
+  { id = model.id, name = model.name, status = Unregistered, isSelected = False, isVisible = True }
+
+
+plusOneResponseModelToPlusOnePair : PlusOneResponseModel -> PlusOnePair
+plusOneResponseModelToPlusOnePair model =
+  (model.partnerAName, model.partnerBName)
 
 
 onGuestSelected : GuestId -> Model -> Model
@@ -143,6 +168,13 @@ doesGuestMatchSearchString searchString matchingPlusOneNames guest =
   String.isEmpty searchString
   || doesGuestNameMatchSearchString searchString guest.name
   || Set.member guest.name matchingPlusOneNames
+
+
+-- SUBSCRIPTIONS
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
 
 
 -- VIEW
@@ -213,8 +245,39 @@ submitButtonView guestList =
     div [ class "submit-button-row row" ]
     [ div [ class "col-4" ] []
     , div [ class "col-4", id "submit-button-container" ]
-      [ button [ class "submit-button btn btn-success", type_ "button", disabled disableButtons ] [ text "Attending" ]
-      , button [ class "submit-button btn btn-danger", type_ "button", disabled disableButtons ] [ text "Not Attending" ]
+      [ button [ class "submit-button btn btn-success", type_ "button", disabled disableButtons, onClick AttendingSubmitted ] [ text "Attending" ]
+      , button [ class "submit-button btn btn-danger", type_ "button", disabled disableButtons, onClick NotAttendingSubmitted ] [ text "Not Attending" ]
       ]
     , div [ class "col-4" ] []
     ]
+
+
+-- HTTP
+
+getGuestList : Cmd Msg
+getGuestList =
+  Http.get
+    { url = "/Rsvp/Guests"
+    , expect = Http.expectJson GuestListLoaded getGuestListResponseDecoder
+    }
+
+
+getGuestListResponseDecoder : Decoder GetGuestListReponse
+getGuestListResponseDecoder =
+  Json.Decode.map2 GetGuestListReponse
+    (field "guests" (list guestResponseModelDecoder))
+    (field "plusOnes" (list plusOneResponseModelDecoder))
+
+
+guestResponseModelDecoder : Decoder GuestResponseModel
+guestResponseModelDecoder =
+  Json.Decode.map2 GuestResponseModel
+    (field "id" int)
+    (field "name" string)
+  
+
+plusOneResponseModelDecoder : Decoder PlusOneResponseModel
+plusOneResponseModelDecoder =
+  Json.Decode.map2 PlusOneResponseModel
+    (field "partnerAName" string)
+    (field "partnerBName" string)
