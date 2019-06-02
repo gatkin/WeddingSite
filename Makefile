@@ -1,12 +1,13 @@
 TAG=wedding-site
 PORT=5005
 WEB_DIRECTORY=src/WeddingSite.Web
+ELM_FILE_PATH=$(WEB_DIRECTORY)/Views/Rsvp/Rsvp.elm
 
 build-docker: build-elm
 	docker build --tag=${TAG} .
 
 build-elm:
-	elm make $(WEB_DIRECTORY)/Views/Rsvp/Rsvp.elm --output=$(WEB_DIRECTORY)/wwwroot/elm/rsvp.elm.js
+	elm make $(ELM_FILE_PATH) --output=$(WEB_DIRECTORY)/wwwroot/elm/rsvp.elm.js
 
 heroku-deploy: heroku-push
 	heroku container:release web
@@ -22,3 +23,6 @@ run: build
 
 watch:
 	dotnet watch --project src/WeddingSite.Web/WeddingSite.Web.csproj run
+
+watch-elm:
+	when-changed $(ELM_FILE_PATH) make build-elm

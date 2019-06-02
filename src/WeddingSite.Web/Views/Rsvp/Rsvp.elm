@@ -1,6 +1,6 @@
 import Browser
 import Html exposing (Html, button, div, h1, input, text)
-import Html.Attributes exposing (class, id, placeholder, type_)
+import Html.Attributes exposing (class, disabled, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
 import Set exposing (Set)
 
@@ -153,6 +153,27 @@ view model =
   [ titleView
   , searchBarView model.searchString
   , guestListView model.guests
+  , submitButtonView model.guests
+  ]
+
+
+titleView : Html Msg
+titleView =
+  div [ class "row", id "title-row" ]
+  [ div [ class "col-12"]
+    [ h1 [] [ text "RSVP" ]
+    ]
+  ]
+
+
+searchBarView : String -> Html Msg
+searchBarView searchText =
+  div [ class "row", id "search-bar-row" ]
+  [ div [ class "col-3" ] []
+  , div [ class "col-6" ]
+    [ input [ class "form-control", placeholder "Search", onInput NewSearch ] []
+    ]
+  , div [ class "col-3" ] [ text ("'" ++ searchText ++ "'") ]
   ]
 
 
@@ -180,25 +201,20 @@ guestListView guests =
     , div [ class "col-8", id "guest-list-container" ]  guestViews
     , div [ class "col-2" ]  []
     ]
-  
 
 
-searchBarView : String -> Html Msg
-searchBarView searchText =
-  div [ class "row", id "search-bar-row" ]
-  [ div [ class "col-3" ] []
-  , div [ class "col-6" ]
-    [ input [ class "form-control", placeholder "Search", onInput NewSearch ] []
+submitButtonView : List Guest -> Html Msg
+submitButtonView guestList =
+  let
+      disableButtons = guestList
+        |> List.any (\guest -> guest.isVisible && guest.isSelected)
+        |> not
+  in
+    div [ class "submit-button-row row" ]
+    [ div [ class "col-4" ] []
+    , div [ class "col-4", id "submit-button-container" ]
+      [ button [ class "submit-button btn btn-success", type_ "button", disabled disableButtons ] [ text "Attending" ]
+      , button [ class "submit-button btn btn-danger", type_ "button", disabled disableButtons ] [ text "Not Attending" ]
+      ]
+    , div [ class "col-4" ] []
     ]
-  , div [ class "col-3" ] [ text ("'" ++ searchText ++ "'") ]
-  ]
-
-
-titleView : Html Msg
-titleView =
-  div [ class "row", id "title-row" ]
-  [ div [ class "col-12"]
-    [ h1 [] [ text "RSVP" ]
-    ]
-  ]
-
