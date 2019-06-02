@@ -151,7 +151,7 @@ view : Model -> Html Msg
 view model =
   div [ class "container-fluid" ]
   [ titleView
-  , searchBarView model.searchString
+  , searchBarView
   , guestListView model.guests
   , submitButtonView model.guests
   ]
@@ -166,14 +166,14 @@ titleView =
   ]
 
 
-searchBarView : String -> Html Msg
-searchBarView searchText =
+searchBarView : Html Msg
+searchBarView =
   div [ class "row", id "search-bar-row" ]
   [ div [ class "col-3" ] []
   , div [ class "col-6" ]
     [ input [ class "form-control", placeholder "Search", onInput NewSearch ] []
     ]
-  , div [ class "col-3" ] [ text ("'" ++ searchText ++ "'") ]
+  , div [ class "col-3" ] []
   ]
 
 
