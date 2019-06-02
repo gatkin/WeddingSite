@@ -10,32 +10,36 @@ main =
 
 -- MODEL
 
+type alias GuestId = Int
+
 type GuestStatus
   = Unregistered
   | Attending
   | NotAttending
 
 type alias Guest =
-  { name: String
+  { id: GuestId
+  , name: String
   , status: GuestStatus
-  , selected: Bool
+  , isSelected: Bool
   }
 
-createGuest : String -> Guest
-createGuest name =
-  { name = name, status = Unregistered, selected = False }
+createGuest : String -> Int -> Guest
+createGuest name guestId =
+  { id = guestId, name = name, status = Unregistered, isSelected = False }
 
 initialGuests : List Guest
 initialGuests =
-  [ createGuest "John Doe"
-  , createGuest "Jane Doe"
-  , createGuest "Philip J Fry"
-  , createGuest "Leela"
-  , createGuest "Zap"
-  , createGuest "Kip"
-  , createGuest "Hermes"
-  , createGuest "Bender"
-  , createGuest "Amy"
+  [ createGuest "John Doe" 1
+  , createGuest "Jane Doe" 2
+  , createGuest "Philip J Fry" 3
+  , createGuest "Leela" 4
+  , createGuest "Zap" 5
+  , createGuest "Kip" 6
+  , createGuest "Hermes" 7
+  , createGuest "Bender" 8
+  , createGuest "Amy" 9
+  , createGuest "Zoidberg" 10
   ]
 
 type alias Model =
@@ -50,13 +54,29 @@ init =
 
 -- UPDATE
 
-type Msg = Increment
+type Msg = SelectGuest GuestId
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Increment ->
-      model
+    SelectGuest guestId ->
+      onGuestSelected guestId model
+
+
+onGuestSelected : GuestId -> Model -> Model
+onGuestSelected guestId model =
+  let
+      newGuestList = model.guests |> List.map (selectGuestIfIdMatches guestId)
+  in
+    { model | guests = newGuestList }
+
+
+selectGuestIfIdMatches : GuestId -> Guest -> Guest
+selectGuestIfIdMatches guestId guest =
+  if guestId == guest.id then
+    { guest | isSelected = not guest.isSelected }
+  else
+    guest
 
 
 -- VIEW
@@ -72,10 +92,14 @@ view model =
 
 guestView : Guest -> Html Msg
 guestView guest =
-  div [ class "guest-name" ]
-  [ button [ class "btn btn-outline-primary", type_ "button" ]
-    [ text guest.name ]
-  ]
+  let
+      buttonOutline = if guest.isSelected then "btn-primary" else "btn-outline-primary"
+      buttonClass = "btn " ++ buttonOutline
+  in
+    div [ class "guest-name" ]
+    [ button [ class buttonClass, type_ "button", onClick (SelectGuest guest.id) ]
+      [ text guest.name ]
+    ]
 
 
 guestListView : List Guest -> Html Msg
@@ -94,11 +118,11 @@ guestListView guests =
 searchBarView : Html Msg
 searchBarView =
   div [ class "row", id "search-bar-row" ]
-  [ div [ class "col-2" ] []
-  , div [ class "col-8" ]
+  [ div [ class "col-3" ] []
+  , div [ class "col-6" ]
     [ input [ class "form-control", placeholder "Search" ] []
     ]
-  , div [ class "col-2" ] []
+  , div [ class "col-3" ] []
   ]
 
 
