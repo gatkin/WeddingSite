@@ -24,5 +24,5 @@ run: build
 watch:
 	dotnet watch --project src/WeddingSite.Web/WeddingSite.Web.csproj run
 
-watch-elm:
+watch-elm: build-elm
 	when-changed $(ELM_FILE_PATH) make build-elm
