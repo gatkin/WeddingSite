@@ -2,6 +2,7 @@ import Browser
 import Html exposing (Html, button, div, h1, input, text)
 import Html.Attributes exposing (class, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
+import Set exposing (Set)
 
 
 main =
@@ -102,29 +103,46 @@ selectGuestIfIdMatches guestId guest =
 onNewSearch : String -> Model -> Model
 onNewSearch searchString model =
   let
-      cleanSearchString = searchString |> String.trim |> String.toLower 
-      newGuestList = model.guests |> filterGuestsOnSearchString cleanSearchString model.plusOnes
+      cleanSearchString = searchString |> String.trim |> String.toLower
+      matchingPlusOneNames = getMatchingPlusOneNames cleanSearchString model.plusOnes
+      newGuestList =  filterGuestsOnSearchString cleanSearchString matchingPlusOneNames model.guests
   in
     { model | searchString = cleanSearchString, guests = newGuestList }
 
 
-filterGuestsOnSearchString : String -> List PlusOnePair -> List Guest -> List Guest
-filterGuestsOnSearchString searchString plusOnes guestList =
-    guestList
-      |> List.map (setVisibleIfMatchesSearch searchString plusOnes)
+getMatchingPlusOneNames : String -> List PlusOnePair -> Set String
+getMatchingPlusOneNames searchString plusOnes =
+  plusOnes
+    |> List.filterMap (getPlusOneNameIfMatchesSearchString searchString)
+    |> Set.fromList
 
 
-setVisibleIfMatchesSearch : String -> List PlusOnePair -> Guest -> Guest
-setVisibleIfMatchesSearch searchString plusOnes guest =
-  { guest | isVisible = doesGuestMatchSearchString searchString plusOnes guest }
-
-
-doesGuestMatchSearchString : String -> List PlusOnePair -> Guest -> Bool
-doesGuestMatchSearchString searchString plusOnes guest =
-  if String.isEmpty searchString || String.contains searchString (String.toLower guest.name) then
-    True
+getPlusOneNameIfMatchesSearchString : String -> PlusOnePair -> Maybe String
+getPlusOneNameIfMatchesSearchString searchString (partnerA, partnerB) =
+  if doesGuestNameMatchSearchString searchString partnerA then
+    Just partnerB
+  else if doesGuestNameMatchSearchString searchString partnerB then
+    Just partnerA
   else
-    False
+    Nothing
+
+
+doesGuestNameMatchSearchString : String -> String -> Bool
+doesGuestNameMatchSearchString searchString guestName =
+  guestName |> String.toLower |> String.contains searchString
+
+
+filterGuestsOnSearchString : String -> Set String -> List Guest -> List Guest
+filterGuestsOnSearchString searchString matchingPlusOneNames guestList =
+    guestList
+      |> List.map (\guest -> { guest | isVisible = doesGuestMatchSearchString searchString matchingPlusOneNames guest })
+
+
+doesGuestMatchSearchString : String -> Set String -> Guest -> Bool
+doesGuestMatchSearchString searchString matchingPlusOneNames guest =
+  String.isEmpty searchString
+  || doesGuestNameMatchSearchString searchString guest.name
+  || Set.member guest.name matchingPlusOneNames
 
 
 -- VIEW
