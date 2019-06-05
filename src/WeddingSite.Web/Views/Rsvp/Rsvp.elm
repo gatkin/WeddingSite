@@ -46,10 +46,15 @@ type alias GetGuestListReponse =
   , plusOnes: List PlusOneResponseModel
   }
 
+type RsvpSubmissionStatus = NotSubmitted
+  | WaitingForResponse
+  | Submitted
+
 type alias Model =
   { guests: List Guest
   , plusOnes: List PlusOnePair
   , searchString: String
+  , rsvpSubmissionStatus: RsvpSubmissionStatus
   }
 
 
@@ -58,6 +63,7 @@ init () =
   ( { guests = []
     , plusOnes = []
     , searchString = ""
+    , rsvpSubmissionStatus = NotSubmitted
     }
   , getGuestList
   ) 
@@ -70,7 +76,7 @@ type Msg = GuestListLoaded (Result Http.Error GetGuestListReponse)
   | NewSearch String
   | AttendingSubmitted
   | NotAttendingSubmitted
-  | RsvpSubmitted (Result Http.Error ())
+  | RsvpSubmissionResponse (Result Http.Error ())
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -90,8 +96,12 @@ update msg model =
       onRsvpSubmitted True model
     NotAttendingSubmitted ->
       onRsvpSubmitted False model
-    RsvpSubmitted result ->
-      (model, Cmd.none)
+    RsvpSubmissionResponse result ->
+      case result of
+        Ok _ ->
+          (onRsvpSubmissionResponse model, Cmd.none)
+        Err _ ->
+          (model, Cmd.none)
 
 
 onGuestListLoaded : GetGuestListReponse -> Model -> Model
@@ -176,7 +186,12 @@ doesGuestMatchSearchString searchString matchingPlusOneNames guest =
 
 onRsvpSubmitted : Bool -> Model -> (Model, Cmd Msg)
 onRsvpSubmitted isAttending model =
-    (model, postRsvpRequest isAttending model.guests)
+    ({ model | rsvpSubmissionStatus = WaitingForResponse }, postRsvpRequest isAttending model.guests)
+
+
+onRsvpSubmissionResponse : Model -> Model
+onRsvpSubmissionResponse model =
+  { model | rsvpSubmissionStatus = Submitted }
 
 
 -- SUBSCRIPTIONS
@@ -190,12 +205,15 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  div [ class "container-fluid" ]
-  [ titleView
-  , searchBarView
-  , guestListView model.guests
-  , submitButtonView model.guests
-  ]
+  let
+    inputDisabled = model.rsvpSubmissionStatus /= NotSubmitted
+  in
+    div [ class "container-fluid" ]
+    [ titleView
+    , searchBarView inputDisabled
+    , guestListView model.guests inputDisabled
+    , submitButtonView model.guests inputDisabled
+    ]
 
 
 titleView : Html Msg
@@ -207,35 +225,23 @@ titleView =
   ]
 
 
-searchBarView : Html Msg
-searchBarView =
+searchBarView : Bool -> Html Msg
+searchBarView inputDisabled =
   div [ class "row", id "search-bar-row" ]
   [ div [ class "col-3" ] []
   , div [ class "col-6" ]
-    [ input [ class "form-control", placeholder "Search", onInput NewSearch ] []
+    [ input [ class "form-control", placeholder "Search", onInput NewSearch, disabled inputDisabled ] []
     ]
   , div [ class "col-3" ] []
   ]
 
 
-guestView : Guest -> Html Msg
-guestView guest =
-  let
-      buttonOutline = if guest.isSelected then "btn-primary" else "btn-outline-primary"
-      buttonClass = "btn " ++ buttonOutline
-  in
-    div [ class "guest-name" ]
-    [ button [ class buttonClass, type_ "button", onClick (SelectGuest guest.id) ]
-      [ text guest.name ]
-    ]
-
-
-guestListView : List Guest -> Html Msg
-guestListView guests =
+guestListView : List Guest -> Bool -> Html Msg
+guestListView guests inputDisabled =
   let
     guestViews = guests
       |> List.filter (\guest -> guest.isVisible)
-      |> List.map guestView
+      |> List.map (guestView inputDisabled)
   in
     div [ class "row" ]
     [ div [ class "col-2" ] []
@@ -244,19 +250,30 @@ guestListView guests =
     ]
 
 
-submitButtonView : List Guest -> Html Msg
-submitButtonView guestList =
+guestView : Bool -> Guest -> Html Msg
+guestView inputDisabled guest =
   let
-      disableButtons = guestList
-        |> List.any (\guest -> guest.isVisible && guest.isSelected)
-        |> not
+      buttonOutline = if guest.isSelected then "btn-primary" else "btn-outline-primary"
+      buttonClass = "btn " ++ buttonOutline
+  in
+    div [ class "guest-name" ]
+    [ button [ class buttonClass, type_ "button", onClick (SelectGuest guest.id), disabled inputDisabled ]
+      [ text guest.name ]
+    ]
+
+
+submitButtonView : List Guest -> Bool -> Html Msg
+submitButtonView guestList inputDisabled =
+  let
+      anySelectedGuests = guestList |> List.any (\guest -> guest.isVisible && guest.isSelected)
+      buttonsDisabled = inputDisabled || (not anySelectedGuests)
   in
     div [ class "submit-button-row row" ]
     [ div [ class "col-4" ] []
     , div [ class "col-4", id "submit-button-container" ]
-      [ button [ class "submit-button btn btn-success", type_ "button", disabled disableButtons, onClick AttendingSubmitted ]
+      [ button [ class "submit-button btn btn-success", type_ "button", disabled buttonsDisabled, onClick AttendingSubmitted ]
         [ text "Attending" ]
-      , button [ class "submit-button btn btn-danger", type_ "button", disabled disableButtons, onClick NotAttendingSubmitted ]
+      , button [ class "submit-button btn btn-danger", type_ "button", disabled buttonsDisabled, onClick NotAttendingSubmitted ]
         [ span [ class "spinner-border spinner-border-sm" ] [],  text "Not Attending" ]
       ]
     , div [ class "col-4" ] []
@@ -306,7 +323,7 @@ postRsvpRequest isAttending guests =
     Http.post
       { url = "/Rsvp/Attendance"
       , body = Http.jsonBody jsonRequest
-      , expect = Http.expectWhatever RsvpSubmitted
+      , expect = Http.expectWhatever RsvpSubmissionResponse
       }
 
 
