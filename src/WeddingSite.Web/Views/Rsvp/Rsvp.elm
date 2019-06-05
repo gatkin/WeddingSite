@@ -1,5 +1,5 @@
 import Browser
-import Html exposing (Html, button, div, h1, input, span, text)
+import Html exposing (Html, button, div, h1, h3, input, span, text)
 import Html.Attributes exposing (class, disabled, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -77,6 +77,7 @@ type Msg = GuestListLoaded (Result Http.Error GetGuestListReponse)
   | AttendingSubmitted
   | NotAttendingSubmitted
   | RsvpSubmissionResponse (Result Http.Error ())
+  | AddAnotherRsvp
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -102,6 +103,8 @@ update msg model =
           (onRsvpSubmissionResponse model, Cmd.none)
         Err _ ->
           (model, Cmd.none)
+    AddAnotherRsvp ->
+      (onAddAnotherRsvp model, Cmd.none)
 
 
 onGuestListLoaded : GetGuestListReponse -> Model -> Model
@@ -194,6 +197,14 @@ onRsvpSubmissionResponse model =
   { model | rsvpSubmissionStatus = Submitted }
 
 
+onAddAnotherRsvp : Model -> Model
+onAddAnotherRsvp model =
+  let
+    newGuests = model.guests |> List.map (\guest -> {guest | isVisible = True, isSelected = False})
+  in
+    { model | searchString = "", rsvpSubmissionStatus = NotSubmitted, guests = newGuests }
+
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
@@ -205,8 +216,16 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
+  if model.rsvpSubmissionStatus == Submitted then
+    completedFormView
+  else
+    incompleteFormView model
+    
+
+incompleteFormView : Model -> Html Msg
+incompleteFormView model =
   let
-    inputDisabled = model.rsvpSubmissionStatus /= NotSubmitted
+    inputDisabled = model.rsvpSubmissionStatus == WaitingForResponse
   in
     div [ class "container-fluid" ]
     [ titleView
@@ -214,6 +233,15 @@ view model =
     , guestListView model.guests inputDisabled
     , submitButtonView model.guests inputDisabled
     ]
+
+
+completedFormView : Html Msg
+completedFormView =
+  div [ class "container-fluid"]
+  [ titleView
+  , thankYouView
+  , addAnotherRsvpView
+  ]
 
 
 titleView : Html Msg
@@ -278,6 +306,26 @@ submitButtonView guestList inputDisabled =
       ]
     , div [ class "col-4" ] []
     ]
+
+
+thankYouView : Html Msg
+thankYouView =
+  div [ class "row" ]
+  [ div [ class "col-4" ] []
+  , div [ class "col-4" ]
+    [ h3 [] [ text "Thank you for your response!" ]
+    ]
+  , div [ class "col-4" ] []
+  ]
+
+
+addAnotherRsvpView : Html Msg
+addAnotherRsvpView =
+  div [ class "row add-another-rsvp-row" ]
+  [ div [ class "col-12" ]
+    [ button [ class "btn btn-primary", type_ "button", onClick AddAnotherRsvp ] [ text "Add Another RSVP" ]
+    ]
+  ]
 
 
 -- HTTP
