@@ -1,39 +1,62 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Google.Cloud.Firestore;
 
 namespace WeddingSite.Core
 {
     public class GuestService : IGuestService
     {
-        private static readonly IEnumerable<Guest> Guests = new []
-        {
-            new Guest{ Name = "John Doe", Id = "1" },
-            new Guest{ Name = "Jane Doe", Id = "2" },
-            new Guest{ Name = "Philip J Fry", Id = "3" },
-            new Guest{ Name = "Turanga Leela", Id = "4" },
-            new Guest{ Name = "Zapp Brannigan", Id = "5" },
-            new Guest{ Name = "Kif Kroker", Id = "6" },
-            new Guest{ Name = "Hermes Conrad", Id = "7" },
-            new Guest{ Name = "Bender Bending Rodrigez", Id = "8" },
-            new Guest{ Name = "Amy Wang", Id = "9" },
-            new Guest{ Name = "Zoidberg" , Id = "10" },
-        };
+        private readonly FirestoreDb Db;
 
-        private static readonly IEnumerable<PlusOnePair> PlusOnePairs = new []
+        public GuestService()
         {
-            new PlusOnePair("1", "2"),
-            new PlusOnePair("3", "4"),
-            new PlusOnePair("6", "9"),
-        };
-
-        public IEnumerable<Guest> GetAllGuests()
-        {
-            return Guests;
+            Db = FirestoreDb.Create("wedding-82625");
         }
 
-        public IEnumerable<PlusOnePair> GetAllPlusOnePairs()
+        public async Task<IEnumerable<Guest>> GetAllGuestsAsync()
         {
-            return PlusOnePairs;
+            var collection = Db.Collection("guests");
+            var snapshot = await collection.GetSnapshotAsync();
+
+            var guests = snapshot.Documents
+                .Select(doc => DocumentToGuest(doc))
+                .ToList();
+
+            return guests;
+        }
+
+        public async Task<IEnumerable<PlusOnePair>> GetAllPlusOnePairsAsync()
+        {
+            var collection = Db.Collection("plusOnes");
+            var snapshot = await collection.GetSnapshotAsync();
+
+            var plusOnes = snapshot.Documents
+                .Select(doc => DocumentToPlusOnePair(doc))
+                .ToList();
+            
+            return plusOnes;
+        }
+
+        private static Guest DocumentToGuest(DocumentSnapshot document)
+        {
+            var dict = document.ToDictionary();
+            return new Guest
+            {
+                Id = document.Id,
+                Name = (string)dict["name"],
+                Status = (string)dict["status"],
+            };
+        }
+
+        private static PlusOnePair DocumentToPlusOnePair(DocumentSnapshot document)
+        {
+            var dict = document.ToDictionary();
+            return new PlusOnePair
+            {
+                PartnerAId = (string)dict["partnerAId"],
+                PartnerBId = (string)dict["partnerBId"],
+            };
         }
     }
 }

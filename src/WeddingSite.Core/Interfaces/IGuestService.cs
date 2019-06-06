@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WeddingSite.Core
 {
     public interface IGuestService
     {
-        IEnumerable<Guest> GetAllGuests();
+        Task<IEnumerable<Guest>> GetAllGuestsAsync();
 
-        IEnumerable<PlusOnePair> GetAllPlusOnePairs();
+        Task<IEnumerable<PlusOnePair>> GetAllPlusOnePairsAsync();
     }
 }

@@ -1,9 +1,9 @@
 namespace WeddingSite.Core
 {
-    public enum GuestStatus
+    public static class GuestStatus
     {
-        Unregistered = 0,
-        Attending = 1,
-        NotAttending = 2,
+        public const string Unregistered = "Unregistered";
+        public const string Attending = "Attending";
+        public const string NotAttending = "NotAttending";
     }
 }

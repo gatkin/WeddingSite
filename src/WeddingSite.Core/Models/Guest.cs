@@ -6,6 +6,6 @@ namespace WeddingSite.Core
 
         public string Name { get; set; } 
 
-        public GuestStatus Status { get; set; } = GuestStatus.Unregistered;
+        public string Status { get; set; } = GuestStatus.Unregistered;
     }
 }

@@ -23,10 +23,10 @@ namespace WeddingSite.Controllers
             return View();
         }
 
-        public GuestListResponse Guests()
+        public async Task<GuestListResponse> Guests()
         {
-            var guests = GuestService.GetAllGuests();
-            var plusOnes = GuestService.GetAllPlusOnePairs();
+            var guests = await GuestService.GetAllGuestsAsync();
+            var plusOnes = await GuestService.GetAllPlusOnePairsAsync();
 
             var guestModels = from guest in guests
                               select new GuestModel{ Id = guest.Id, Name = guest.Name };
