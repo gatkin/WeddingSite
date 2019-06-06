@@ -4,7 +4,7 @@ namespace WeddingSite.Models
 {
     public class AttendanceRequest
     {
-        public IEnumerable<int> GuestIds { get; set; }
+        public IEnumerable<string> GuestIds { get; set; }
 
         public bool IsAttending { get; set; }
     }

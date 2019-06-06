@@ -2,11 +2,11 @@ namespace WeddingSite.Core
 {
     public class PlusOnePair
     {
-        public int PartnerAId { get; set; }
+        public string PartnerAId { get; set; }
 
-        public int PartnerBId { get; set; }
+        public string PartnerBId { get; set; }
 
-        public PlusOnePair(int aId, int bId)
+        public PlusOnePair(string aId, string bId)
         {
             PartnerAId = aId;
             PartnerBId = bId;

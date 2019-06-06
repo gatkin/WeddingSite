@@ -3,7 +3,7 @@ import Html exposing (Html, button, div, h1, h3, input, span, text)
 import Html.Attributes exposing (class, disabled, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Decode exposing (Decoder, field, int, list, string)
+import Json.Decode exposing (Decoder, field, list, string)
 import Json.Encode as Encode
 import Set exposing (Set)
 
@@ -14,7 +14,7 @@ main =
 
 -- MODEL
 
-type alias GuestId = Int
+type alias GuestId = String
 
 type GuestStatus
   = Unregistered
@@ -348,7 +348,7 @@ getGuestListResponseDecoder =
 guestResponseModelDecoder : Decoder GuestResponseModel
 guestResponseModelDecoder =
   Json.Decode.map2 GuestResponseModel
-    (field "id" int)
+    (field "id" string)
     (field "name" string)
   
 
@@ -364,7 +364,7 @@ postRsvpRequest isAttending guests =
   let
     selectedGuestIds = getSelectedGuestIds guests
     jsonRequest = Encode.object
-      [ ( "GuestIds", Encode.list Encode.int selectedGuestIds )
+      [ ( "GuestIds", Encode.list Encode.string selectedGuestIds )
       , ( "IsAttending", Encode.bool isAttending )
       ]
   in

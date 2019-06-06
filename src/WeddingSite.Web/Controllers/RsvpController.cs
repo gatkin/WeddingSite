@@ -51,7 +51,7 @@ namespace WeddingSite.Controllers
             return request;
         }
 
-        private static string GetGuestNameById(IEnumerable<Guest> guests, int id)
+        private static string GetGuestNameById(IEnumerable<Guest> guests, string id)
         {
             return guests.Single(guest => guest.Id == id).Name;
         }
