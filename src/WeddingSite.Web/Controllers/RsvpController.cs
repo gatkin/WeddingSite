@@ -46,9 +46,14 @@ namespace WeddingSite.Controllers
         }
 
         [HttpPost]
-        public AttendanceRequest Attendance([FromBody]AttendanceRequest request)
+        public async Task<ActionResult> Attendance([FromBody]AttendanceRequest request)
         {
-            return request;
+            foreach (var guestId in request.GuestIds)
+            {
+                await GuestService.UpdateGuestStatusAsync(guestId, request.IsAttending);
+            }
+
+            return Ok();
         }
 
         private static string GetGuestNameById(IEnumerable<Guest> guests, string id)

@@ -38,6 +38,14 @@ namespace WeddingSite.Core
             return plusOnes;
         }
 
+        public async Task UpdateGuestStatusAsync(string guestId, bool isAttending)
+        {
+            var status = isAttending ? GuestStatus.Attending : GuestStatus.NotAttending;
+
+            await Db.Document($"guests/{guestId}")
+                .UpdateAsync(new Dictionary<string, object>{ { "status", status } });
+        }
+
         private static Guest DocumentToGuest(DocumentSnapshot document)
         {
             var dict = document.ToDictionary();

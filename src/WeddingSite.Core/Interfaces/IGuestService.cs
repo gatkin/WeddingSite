@@ -8,5 +8,7 @@ namespace WeddingSite.Core
         Task<IEnumerable<Guest>> GetAllGuestsAsync();
 
         Task<IEnumerable<PlusOnePair>> GetAllPlusOnePairsAsync();
+
+        Task UpdateGuestStatusAsync(string guestId, bool isAttending);
     }
 }
