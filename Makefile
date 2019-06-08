@@ -2,6 +2,7 @@ TAG=wedding-site
 PORT=5005
 WEB_DIRECTORY=src/WeddingSite.Web
 ELM_FILE_PATH=${WEB_DIRECTORY}/Views/Rsvp/Rsvp.elm
+HEROKU_REGISTRY=registry.heroku.com/mckayandgreg/web
 
 build-docker: build-elm
 	docker build \
@@ -25,8 +26,9 @@ heroku-deploy: heroku-push
 heroku-init:
 	heroku login && heroku container:login
 
-heroku-push: heroku-init
-	heroku container:push web
+heroku-push: heroku-init build-docker
+	docker tag ${TAG}:latest ${HEROKU_REGISTRY} && \
+	docker push ${HEROKU_REGISTRY}
 
 run: build-docker
 	docker run -e PORT=${PORT} -p ${PORT}:${PORT} ${TAG}:latest
