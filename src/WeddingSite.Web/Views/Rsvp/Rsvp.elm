@@ -110,11 +110,35 @@ update msg model =
 onGuestListLoaded : GetGuestListReponse -> Model -> Model
 onGuestListLoaded response model =
   let
-      guests = response.guests |> List.map guestResponseModelToGuest
+      guests = response.guests
+        |> List.map guestResponseModelToGuest
+        |> List.sortWith orderByName
       plusOnes = response.plusOnes |> List.map plusOneResponseModelToPlusOnePair
   in
     { model | guests = guests, plusOnes = plusOnes }
-  
+
+
+orderByName : Guest -> Guest -> Order
+orderByName a b =
+  let
+      (aFirst, aLast) = getFirstAndLastName a
+      (bFirst, bLast) = getFirstAndLastName b
+  in
+      if aLast == bLast then
+        compare aFirst bFirst
+      else
+        compare aLast bLast
+
+
+getFirstAndLastName : Guest -> (String, String)
+getFirstAndLastName guest =
+  let
+      names = String.split " " guest.name
+      firstName = names |> List.head |> Maybe.withDefault guest.name
+      lastName = names |> List.drop 1 |> List.head |> Maybe.withDefault guest.name
+  in
+    (firstName, lastName)
+
 
 guestResponseModelToGuest : GuestResponseModel -> Guest
 guestResponseModelToGuest model =
