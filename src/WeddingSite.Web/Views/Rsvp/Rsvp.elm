@@ -305,7 +305,7 @@ guestListView guests inputDisabled =
 guestView : Bool -> Guest -> Html Msg
 guestView inputDisabled guest =
   let
-      buttonOutline = if guest.isSelected then "btn-primary" else "btn-outline-primary"
+      buttonOutline = if guest.isSelected then "selected-guest" else "unselected-guest"
       buttonClass = "btn " ++ buttonOutline
   in
     div [ class "guest-name" ]
@@ -323,9 +323,9 @@ submitButtonView guestList inputDisabled =
     div [ class "submit-button-row row" ]
     [ div [ class "col-sm-4" ] []
     , div [ class "col-sm-4", id "submit-button-container" ]
-      [ button [ class "submit-button btn btn-success", type_ "button", disabled buttonsDisabled, onClick AttendingSubmitted ]
+      [ button [ id "attending-button", class "submit-button btn", type_ "button", disabled buttonsDisabled, onClick AttendingSubmitted ]
         [ text "Attending" ]
-      , button [ class "submit-button btn btn-danger", type_ "button", disabled buttonsDisabled, onClick NotAttendingSubmitted ]
+      , button [  id "not-attending-button", class "submit-button btn", type_ "button", disabled buttonsDisabled, onClick NotAttendingSubmitted ]
         [ span [ class "spinner-border spinner-border-sm" ] [],  text "Not Attending" ]
       ]
     , div [ class "col-4" ] []
