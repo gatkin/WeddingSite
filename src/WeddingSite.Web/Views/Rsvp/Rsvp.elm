@@ -280,11 +280,11 @@ titleView =
 searchBarView : Bool -> Html Msg
 searchBarView inputDisabled =
   div [ class "row", id "search-bar-row" ]
-  [ div [ class "col-3" ] []
-  , div [ class "col-6" ]
+  [ div [ class "col-sm-3" ] []
+  , div [ class "col-sm-6" ]
     [ input [ class "form-control", placeholder "Search", onInput NewSearch, disabled inputDisabled ] []
     ]
-  , div [ class "col-3" ] []
+  , div [ class "col-sm-3" ] []
   ]
 
 
@@ -296,9 +296,9 @@ guestListView guests inputDisabled =
       |> List.map (guestView inputDisabled)
   in
     div [ class "row" ]
-    [ div [ class "col-2" ] []
-    , div [ class "col-8", id "guest-list-container" ]  guestViews
-    , div [ class "col-2" ]  []
+    [ div [ class "col-sm-2" ] []
+    , div [ class "col-sm-8", id "guest-list-container" ]  guestViews
+    , div [ class "col-sm-2" ]  []
     ]
 
 
@@ -321,8 +321,8 @@ submitButtonView guestList inputDisabled =
       buttonsDisabled = inputDisabled || (not anySelectedGuests)
   in
     div [ class "submit-button-row row" ]
-    [ div [ class "col-4" ] []
-    , div [ class "col-4", id "submit-button-container" ]
+    [ div [ class "col-sm-4" ] []
+    , div [ class "col-sm-4", id "submit-button-container" ]
       [ button [ class "submit-button btn btn-success", type_ "button", disabled buttonsDisabled, onClick AttendingSubmitted ]
         [ text "Attending" ]
       , button [ class "submit-button btn btn-danger", type_ "button", disabled buttonsDisabled, onClick NotAttendingSubmitted ]
@@ -335,11 +335,11 @@ submitButtonView guestList inputDisabled =
 thankYouView : Html Msg
 thankYouView =
   div [ class "row" ]
-  [ div [ class "col-4" ] []
-  , div [ class "col-4" ]
+  [ div [ class "col-sm-4" ] []
+  , div [ class "col-sm-4" ]
     [ h3 [] [ text "Thank you for your response!" ]
     ]
-  , div [ class "col-4" ] []
+  , div [ class "col-sm-4" ] []
   ]
 
 
