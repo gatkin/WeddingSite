@@ -18,7 +18,7 @@ build-docker: build-elm
 	--tag=${TAG} .
 
 build-elm:
-	elm make ${ELM_FILE_PATH} --output=${WEB_DIRECTORY}/wwwroot/elm/rsvp.elm.js
+	elm make ${ELM_FILE_PATH} --optimize --output=${WEB_DIRECTORY}/wwwroot/elm/rsvp.elm.js
 
 heroku-deploy: heroku-push
 	heroku container:release web
