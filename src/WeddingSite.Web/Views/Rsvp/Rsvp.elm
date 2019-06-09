@@ -347,7 +347,7 @@ addAnotherRsvpView : Html Msg
 addAnotherRsvpView =
   div [ class "row add-another-rsvp-row" ]
   [ div [ class "col-12" ]
-    [ button [ class "btn btn-primary", type_ "button", onClick AddAnotherRsvp ] [ text "Add Another RSVP" ]
+    [ button [ id "add-rsvp-btn", class "btn", type_ "button", onClick AddAnotherRsvp ] [ text "Add Another RSVP" ]
     ]
   ]
 
