@@ -1,5 +1,5 @@
 import Browser
-import Html exposing (Html, button, div, h1, h3, input, span, text)
+import Html exposing (Html, button, div, h1, h3, input, p, span, text)
 import Html.Attributes exposing (class, disabled, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -66,7 +66,7 @@ init () =
     , rsvpSubmissionStatus = NotSubmitted
     }
   , getGuestList
-  ) 
+  )
 
 
 -- UPDATE
@@ -242,9 +242,19 @@ view : Model -> Html Msg
 view model =
   if model.rsvpSubmissionStatus == Submitted then
     completedFormView
+  else if String.isEmpty model.searchString then
+    noSearchStringView
   else
     incompleteFormView model
-    
+
+
+noSearchStringView : Html Msg
+noSearchStringView =
+  div [ class "container-fluid" ]
+  [ titleView
+  , searchBarView False
+  ]
+
 
 incompleteFormView : Model -> Html Msg
 incompleteFormView model =
@@ -273,6 +283,7 @@ titleView =
   div [ class "row", id "title-row" ]
   [ div [ class "col-12"]
     [ h1 [] [ text "RSVP" ]
+    , p [] [ text "Please search for your name and let us know if you can attend by September 1st" ]
     ]
   ]
 
@@ -282,7 +293,7 @@ searchBarView inputDisabled =
   div [ class "row", id "search-bar-row" ]
   [ div [ class "col-sm-3" ] []
   , div [ class "col-sm-6" ]
-    [ input [ class "form-control", placeholder "Search", onInput NewSearch, disabled inputDisabled ] []
+    [ input [ class "form-control", placeholder "Search by your name", onInput NewSearch, disabled inputDisabled ] []
     ]
   , div [ class "col-sm-3" ] []
   ]
@@ -374,7 +385,7 @@ guestResponseModelDecoder =
   Json.Decode.map2 GuestResponseModel
     (field "id" string)
     (field "name" string)
-  
+
 
 plusOneResponseModelDecoder : Decoder PlusOneResponseModel
 plusOneResponseModelDecoder =
