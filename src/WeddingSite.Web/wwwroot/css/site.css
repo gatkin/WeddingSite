@@ -78,15 +78,14 @@ p {
 #image-text {
   position: absolute;
   color: white;
-  top: 20%;
-  left: 60%;
+  top: 30%;
+  left: 5%;
   text-align: center;
   padding: 1em;
-  margin-left: 1em;
 }
 
 #image-title {
-  font-size: 3.2em;
+  font-size: 4.2em;
 }
 
 .details-row {
