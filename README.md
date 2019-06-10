@@ -1,11 +1,16 @@
-# GregAndMcKay.wedding
+# McKay and Greg's Wedding Site
 
-Features
-- Event details:
-    - Date
-    - Time
-    - Address
-    - No Registry
-    - Hotel Information
-- RSVP management
-- Photo management
+Simple site for information about our wedding and recording RSVPs.
+
+This is hosted and run with a variety of free and low-cost tier cloud services:
+
+- The backend is hosted as a Docker container running on Heroku
+- The database is a Firebase Cloud Firestore database
+- Google
+
+
+The app is built with
+
+- .NET core backend
+- [Elm](https://elm-lang.org/) frontend for the interactive RSVP page
+- Vanilla bootstrap for styling
