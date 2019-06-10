@@ -6,7 +6,7 @@ This is hosted and run with a variety of free and low-cost tier cloud services:
 
 - The backend is hosted as a Docker container running on Heroku
 - The database is a Firebase Cloud Firestore database
-- Google
+- Google domains
 
 
 The app is built with
