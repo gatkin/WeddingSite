@@ -89,12 +89,12 @@ p {
 }
 
 .details-row {
-  height: 40em;
+  height: 30em;
 }
 
 .details-container {
   position: relative;
-  top: 50%;
+  top: 20%;
   bottom: 50%;
   text-align: center;
   vertical-align: middle;
@@ -110,7 +110,6 @@ p {
 }
 
 #registry-row {
-  margin-top: 5em;
   color: white;
   background-color: #7e57c2;
 }
