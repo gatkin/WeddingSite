@@ -6,4 +6,4 @@ pool:
 
 steps:
 - script: make build-docker
-displayName: Build
+  displayName: Build
