@@ -30,8 +30,13 @@ heroku-push: heroku-init build-docker
 	docker tag ${TAG}:latest ${HEROKU_REGISTRY} && \
 	docker push ${HEROKU_REGISTRY}
 
+per-commit: setup build-docker
+
 run: build-docker
 	docker run -e PORT=${PORT} -p ${PORT}:${PORT} ${TAG}:latest
+
+setup:
+	npm install -g elm
 
 watch:
 	dotnet watch --project src/WeddingSite.Web/WeddingSite.Web.csproj run
