@@ -36,7 +36,7 @@ run: build-docker
 	docker run -e PORT=${PORT} -p ${PORT}:${PORT} ${TAG}:latest
 
 setup:
-	sudo npm install -g elm
+	sudo npm install elm --global
 
 watch:
 	dotnet watch --project src/WeddingSite.Web/WeddingSite.Web.csproj run
