@@ -4,7 +4,7 @@ WEB_DIRECTORY=src/WeddingSite.Web
 ELM_FILE_PATH=${WEB_DIRECTORY}/Views/Rsvp/Rsvp.elm
 HEROKU_REGISTRY=registry.heroku.com/mckayandgreg/web
 
-build-docker: build-elm
+build-docker:
 	docker build \
 	--build-arg FIREBASE_PROJECT_ID="${FIREBASE_PROJECT_ID}" \
 	--build-arg FIREBASE_PRIVATE_KEY_ID="${FIREBASE_PRIVATE_KEY_ID}" \
@@ -18,7 +18,7 @@ build-docker: build-elm
 	--tag=${TAG} .
 
 build-elm:
-	elm make ${ELM_FILE_PATH} --optimize --output=${WEB_DIRECTORY}/wwwroot/elm/rsvp.elm.js
+	./src/BuildScripts/build-elm-sources.sh
 
 heroku-deploy: heroku-push
 	heroku container:release web
@@ -30,13 +30,10 @@ heroku-push: heroku-init build-docker
 	docker tag ${TAG}:latest ${HEROKU_REGISTRY} && \
 	docker push ${HEROKU_REGISTRY}
 
-per-commit: setup build-docker
+per-commit: build-docker
 
 run: build-docker
 	docker run -e PORT=${PORT} -p ${PORT}:${PORT} ${TAG}:latest
-
-setup:
-	sudo npm install -g elm --unsafe-perm=true --allow-root
 
 watch:
 	dotnet watch --project src/WeddingSite.Web/WeddingSite.Web.csproj run

@@ -1,6 +1,7 @@
 # Build the buildtime image
 FROM microsoft/dotnet:sdk AS build-env
 
+# Grab build time arguments and make them available as environment variables
 ARG FIREBASE_PROJECT_ID
 ARG FIREBASE_PRIVATE_KEY_ID
 ARG FIREBASE_PRIVATE_KEY
@@ -22,21 +23,26 @@ ENV FIREBASE_AUTH_PROVIDER_CERT_URL ${FIREBASE_AUTH_PROVIDER_CERT_URL}
 ENV FIREBASE_CLIENT_CERT_URL ${FIREBASE_CLIENT_CERT_URL}
 
 WORKDIR /app
-COPY ./src ./
+COPY ./ ./
 
-# Build the auth file
-RUN python ./BuildScripts/create_firebase_auth.py FirebaseAuth.json
+# Download the Elm toolchain and build the Elm sources
+RUN wget -qO - "https://github.com/elm/compiler/releases/download/0.19.0/binaries-for-linux.tar.gz" | tar -zxC /usr/local/bin/
+RUN ./src/BuildScripts/build-elm-sources.sh
 
-# Build and restore in separate layers
-RUN dotnet restore WeddingSite.Web
-RUN dotnet build --configuration Release WeddingSite.Web
-RUN dotnet publish --configuration Release -o out WeddingSite.Web
+# Build the firebase auth file
+RUN python ./src/BuildScripts/create_firebase_auth.py FirebaseAuth.json
+
+# Build the backend and restore in separate layers
+ENV MAIN_PROJECT=src/WeddingSite.Web
+RUN dotnet restore ${MAIN_PROJECT}
+RUN dotnet build --configuration Release ${MAIN_PROJECT}
+RUN dotnet publish --configuration Release -o out ${MAIN_PROJECT}
 
 # Build the runtime image
 FROM microsoft/dotnet:aspnetcore-runtime
 
 WORKDIR /app
-COPY --from=build-env /app/WeddingSite.Web/out .
+COPY --from=build-env /app/src/WeddingSite.Web/out .
 
 # Make the firebase authentication information available to the application
 COPY --from=build-env /app/FirebaseAuth.json /app/FirebaseAuth.json
