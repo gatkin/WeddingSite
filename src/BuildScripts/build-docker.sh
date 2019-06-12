@@ -1,4 +1,5 @@
-docker login -u _ -p $HEROKU_API_KEY registry.heroku.com/mckayandgreg/web && \
+# Builds the Docker image with all authentication secret values passed in from the
+# environment variables.
 docker build \
     --build-arg FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
     --build-arg FIREBASE_PRIVATE_KEY_ID="$FIREBASE_PRIVATE_KEY_ID" \
