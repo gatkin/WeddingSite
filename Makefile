@@ -9,8 +9,8 @@ build-docker:
 build-elm:
 	./src/BuildScripts/build-elm-sources.sh
 
-deploy-heroku: push-heroku
-	./src/BuildScripts/deploy-heroku.sh
+deploy-heroku:
+	heroku container:release web
 
 per-commit: deploy-heroku
 
