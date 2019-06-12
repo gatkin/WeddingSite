@@ -21,16 +21,14 @@ build-elm:
 	./src/BuildScripts/build-elm-sources.sh
 
 heroku-deploy: heroku-push
-	heroku container:release web
+	./src/BuildScripts/deploy-heroku.sh
 
-heroku-init:
-	heroku login && heroku container:login
-
-heroku-push: heroku-init build-docker
+heroku-push: build-docker
+	echo ${HEROKU_API_KEY} | docker login --username=_ --password-stdin ${HEROKU_REGISTRY} && \
 	docker tag ${TAG}:latest ${HEROKU_REGISTRY} && \
 	docker push ${HEROKU_REGISTRY}
 
-per-commit: build-docker
+per-commit: heroku-deploy
 
 run: build-docker
 	docker run -e PORT=${PORT} -p ${PORT}:${PORT} ${TAG}:latest
