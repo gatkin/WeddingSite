@@ -7,4 +7,4 @@ steps:
     inputs:
       script: make per-commit
       targetType: inline
-      heroku.api.key: $(heroku.api.key)
+      heroku.api.key: $(HEROKU_API_KEY)
