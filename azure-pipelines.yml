@@ -2,7 +2,9 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
-- script: make per-commit
-  displayName: Build
-  inputs:
-    heroku.api.key: $(heroku.api.key)
+  - task: Bash@3
+    displayName: Build
+    inputs:
+      script: make per-commit
+      targetType: inline
+      heroku.api.key: $(heroku.api.key)
