@@ -5,7 +5,7 @@ ELM_FILE_PATH=$(WEB_DIRECTORY)/Views/Rsvp/Rsvp.elm
 HEROKU_REGISTRY=registry.heroku.com/mckayandgreg/web
 
 build-docker:
-	docker login -u _ -p $(HEROKU_API_KEY) $(HEROKU_REGISTRY) && \
+	echo $(HEROKU_API_KEY) | docker login -u _ --password-stdin $(HEROKU_REGISTRY) && \
 	docker build \
 	--build-arg FIREBASE_PROJECT_ID="$(FIREBASE_PROJECT_ID)" \
 	--build-arg FIREBASE_PRIVATE_KEY_ID="$(FIREBASE_PRIVATE_KEY_ID)" \
