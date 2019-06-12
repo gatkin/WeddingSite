@@ -5,6 +5,7 @@ ELM_FILE_PATH=${WEB_DIRECTORY}/Views/Rsvp/Rsvp.elm
 HEROKU_REGISTRY=registry.heroku.com/mckayandgreg/web
 
 build-docker:
+	docker login -u _ -p ${HEROKU_API_KEY} ${HEROKU_REGISTRY} && \
 	docker build \
 	--build-arg FIREBASE_PROJECT_ID="${FIREBASE_PROJECT_ID}" \
 	--build-arg FIREBASE_PRIVATE_KEY_ID="${FIREBASE_PRIVATE_KEY_ID}" \
@@ -24,7 +25,7 @@ heroku-deploy: heroku-push
 	./src/BuildScripts/deploy-heroku.sh
 
 heroku-push: build-docker
-	docker login --username=_ --password=${HEROKU_API_KEY} ${HEROKU_REGISTRY} && \
+	docker login -u _ -p ${HEROKU_API_KEY} ${HEROKU_REGISTRY} && \
 	docker tag ${TAG}:latest ${HEROKU_REGISTRY} && \
 	docker push ${HEROKU_REGISTRY}
 
