@@ -5,4 +5,4 @@ steps:
   - bash: make per-commit
     displayName: Build
     env:
-      heroku.api.key: $(HEROKU_API_KEY)
+      HEROKU_API_KEY: $(HEROKU_API_KEY)
