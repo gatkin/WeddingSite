@@ -4,3 +4,5 @@ pool:
 steps:
 - script: make per-commit
   displayName: Build
+  inputs:
+    heroku.api.key: $(heroku.api.key)
