@@ -24,7 +24,7 @@ heroku-deploy: heroku-push
 	./src/BuildScripts/deploy-heroku.sh
 
 heroku-push: build-docker
-	echo ${HEROKU_API_KEY} | docker login --username=_ --password-stdin ${HEROKU_REGISTRY} && \
+	docker login --username=_ --password=${HEROKU_API_KEY} ${HEROKU_REGISTRY} && \
 	docker tag ${TAG}:latest ${HEROKU_REGISTRY} && \
 	docker push ${HEROKU_REGISTRY}
 
