@@ -12,7 +12,7 @@ build-elm:
 deploy-heroku:
 	heroku container:release web
 
-per-commit: deploy-heroku
+per-commit: push-heroku
 
 push-heroku: build-docker
 	./src/BuildScripts/push-heroku.sh
