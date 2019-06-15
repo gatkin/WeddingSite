@@ -62,6 +62,14 @@ p {
   line-height: 60px; /* Vertically center the text there */
 }
 
+#site-source-container {
+  text-align: right;
+}
+
+#site-source-link {
+  padding: 0.2em;
+}
+
 .main-container {
   padding: 0;
 }
