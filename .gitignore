@@ -331,6 +331,6 @@ ASALocalRun/
 
 .DS_Store
 elm-stuff/
-src/WeddingSite.Web/wwwroot/elm/
+src/WeddingSite.Web/wwwroot/elm/*.js
 *.min.js
 *.min.css
