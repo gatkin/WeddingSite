@@ -4,11 +4,11 @@
 
 Simple site for information about our wedding and recording RSVPs.
 
-This is hosted and run with a variety of free and low-cost tier cloud services:
+The site is hosted and run by stitching together a variety of free and low-cost tier cloud services:
 
 - The backend is hosted as a Docker container running on Heroku
 - The database is a Firebase Cloud Firestore database
-- Google domains
+- Google domains for the custom domain name
 
 
 The app is built with
