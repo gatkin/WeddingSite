@@ -96,8 +96,26 @@ p {
   font-size: 4.2em;
 }
 
+@media(max-width: 768px) {
+  #image-title {
+    font-size: 3em;
+  }
+  .image-subtext {
+    font-size: 2em;
+  }
+}
+
+@media(max-width: 450px) {
+  #image-title {
+    font-size: 2em;
+  }
+  .image-subtext {
+    font-size: 1.2em;
+  }
+}
+
 .details-row {
-  height: 30em;
+  min-height: 35em;
 }
 
 .details-container {
@@ -121,7 +139,6 @@ p {
 #registry-row {
   color: white;
   background-color: #7e57c2;
-  margin-top: 2em;
 }
 
 #search-bar-row {
