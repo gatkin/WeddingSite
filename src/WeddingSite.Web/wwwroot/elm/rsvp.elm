@@ -1,6 +1,6 @@
 import Browser
-import Html exposing (Html, button, div, h1, h3, input, p, span, text)
-import Html.Attributes exposing (class, disabled, id, placeholder, type_)
+import Html exposing (Html, a, button, div, h1, h2, h3, h5, img, input, p, span, text)
+import Html.Attributes exposing (class, disabled, href, id, placeholder, src, target, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode exposing (Decoder, field, list, string)
@@ -240,13 +240,76 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  if model.rsvpSubmissionStatus == Submitted then
-    completedFormView
-  else if String.isEmpty model.searchString then
-    noSearchStringView
-  else
-    incompleteFormView model
+  div [ class "container-fluid main-container" ]
+    [ heroImageView
+    , receptionDetailsView
+    , registryDetailsView
+    , rsvpView model
+    ]
 
+
+heroImageView : Html Msg
+heroImageView =
+  div [ class "row" ]
+    [ div [ id "hero-image-col", class "col-12" ]
+      [ img [ id "hero-image", src "images/Hero.jpg" ] []
+      , div [ id "image-text" ]
+        [ h1 [ id "image-title" ] [ text "McKay & Greg" ]
+        , h3 [ id "image-date" ] [ text "September 21, 2019" ]
+        , h3 [ id "image-location" ] [ text "Lincoln, NE" ]
+        ]
+      ]
+    ]
+
+receptionDetailsView : Html Msg
+receptionDetailsView =
+  div [ class "row details-row" ]
+    [ div [ class "col-sm-3" ] []
+    , div [ class "col-sm-6" ]
+      [ div [ id "reception-details", class "details-container" ]
+        [ h2 [] [ text "Wedding Reception" ]
+        , h5 [] [ text "5 PM | September 21, 2019" ]
+        , h5 [] [ text "Capital Vew Winery" ]
+        , p [] [ a [ target "_blank", href "https://goo.gl/maps/KPN95RXtjDjqaGK59" ] [ text "2361 Wittstruck Rd | Roca, NE | 68430" ] ]
+        , p [ class "details-paragraph" ]
+            [ text "The reception will be held at "
+            , a [ target "_blank", href "https://capitolviewwinery.com/" ] [ text "Capital View Winery" ]
+            , text ". Join us for food, wine, and yard games to celebrate our marriage."
+            ]
+        , a [ href "/#rsvp", id "rsvp-button", class "btn btn-lg" ] [ text "RSVP" ]
+        ]
+      ]
+    , div [ class "col-sm-3" ] []
+    ]
+
+registryDetailsView : Html Msg
+registryDetailsView =
+  div [ id "registry-row", class "row details-row" ]
+    [ div [ class "col-sm-3" ] []
+    , div [ class "col-sm-6" ]
+      [ div [ class "details-container" ]
+        [ h2 [] [ text "Registry" ]
+        , p [ class "details-paragraph" ] [ text "The presence of your company is the only gift we could ever ask for. We will not be registering as we have everything we need to start the next chapter of our lives together." ]
+        ]
+      ]
+    , div [ class "col-sm-3" ] []
+    ]
+
+rsvpView : Model -> Html Msg
+rsvpView model =
+  let
+    formView = if model.rsvpSubmissionStatus == Submitted then
+                  completedFormView
+                else if String.isEmpty model.searchString then
+                  noSearchStringView
+                else
+                  incompleteFormView model
+  in
+    div [ id "rsvp", class "row details-row" ]
+      [ div [ class "col-12" ]
+        [ div [ class "details-container" ] [ formView ]
+        ]
+      ]
 
 noSearchStringView : Html Msg
 noSearchStringView =
