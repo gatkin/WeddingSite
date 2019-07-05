@@ -155,7 +155,7 @@ p {
   flex-wrap: wrap;
   justify-content: center;
   max-height: 10em;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .guest-name {
