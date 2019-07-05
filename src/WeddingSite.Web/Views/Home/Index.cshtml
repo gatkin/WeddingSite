@@ -19,8 +19,7 @@
                 <h6>Capital View Winery</h6>
                 <p><a target="_blank" href="https://goo.gl/maps/KPN95RXtjDjqaGK59">2361 Wittstruck Rd | Roca, NE | 68430</a></p>
                 <p class="details-paragraph">The reception will be held at <a target="_blank" href="https://capitolviewwinery.com/">Capital View Winery</a>. Join us for food, wine, and yard games to celebrate our marriage.</p>
-                <p>Please RSVP</p>
-                <a href="/RSVP" id="rsvp-button" class="btn btn-lg">RSVP</a>
+                <a href="/#rsvp-row" id="rsvp-button" class="btn btn-lg">RSVP</a>
             </div>
         </div>
         <div class="col-sm-3"></div>
@@ -36,4 +35,22 @@
         </div>
         <div class="col-sm-3"></div>
     </div>
+
+    <div id="rsvp-row" class="row details-row text-center">
+        <div class="col-12">
+            <div class="details-container">
+                <div id="elm"></div>
+            </div>
+        </div>
+    </div>
+    
+    <environment include="Development">
+        <script src="~/elm/rsvp.elm.js" asp-append-version="true"></script>
+    </environment>
+    <script>
+        var app = Elm.Main.init({
+            node: document.getElementById('elm'),
+        });
+    </script>
+</div>
 </div>

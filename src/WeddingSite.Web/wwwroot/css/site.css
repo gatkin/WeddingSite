@@ -115,7 +115,7 @@ p {
 }
 
 .details-row {
-  min-height: 35em;
+  min-height: 40em;
 }
 
 .details-container {
@@ -154,6 +154,8 @@ p {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  max-height: 10em;
+  overflow: auto;
 }
 
 .guest-name {

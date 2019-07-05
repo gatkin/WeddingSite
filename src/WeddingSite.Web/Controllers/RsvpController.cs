@@ -18,11 +18,6 @@ namespace WeddingSite.Controllers
             GuestService = guestService;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         public async Task<GuestListResponse> Guests()
         {
             var guests = await GuestService.GetAllGuestsAsync();

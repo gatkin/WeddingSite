@@ -334,3 +334,4 @@ elm-stuff/
 src/WeddingSite.Web/wwwroot/elm/*.js
 *.min.js
 *.min.css
+secrets/
