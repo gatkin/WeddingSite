@@ -1,7 +1,7 @@
 TAG=wedding-site
 PORT=5005
 WEB_DIRECTORY=src/WeddingSite.Web
-ELM_FILE_PATH=$(WEB_DIRECTORY)/wwwroot/elm/rsvp.elm
+ELM_FILE_PATH=$(WEB_DIRECTORY)/wwwroot/elm/index.elm
 
 build-docker:
 	./src/BuildScripts/build-docker.sh
