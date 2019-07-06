@@ -1,15 +1,22 @@
 import Browser
-import Html exposing (Html, a, button, div, h1, h2, h3, h5, img, input, p, span, text)
+import Html exposing (Html, a, br, button, div, h1, h2, h3, h5, img, input, p, span, text)
 import Html.Attributes exposing (class, disabled, href, id, placeholder, src, target, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode exposing (Decoder, field, list, string)
 import Json.Encode as Encode
 import Set exposing (Set)
+import Task
+import Time exposing (Posix, millisToPosix, posixToMillis)
 
 
 main =
-  Browser.element { init = init, update = update, subscriptions = subscriptions, view = view }
+  Browser.element
+    { init = init
+    , update = update
+    , subscriptions = subscriptions
+    , view = view
+    }
 
 
 -- MODEL
@@ -50,11 +57,35 @@ type RsvpSubmissionStatus = NotSubmitted
   | WaitingForResponse
   | Submitted
 
+type alias Countdown =
+  { days: Int
+  , hours: Int
+  , minutes: Int
+  , seconds: Int
+  }
+
+weddingDate : Posix
+weddingDate = millisToPosix 1569103200000
+
+millisecondsPerSecond : Int
+millisecondsPerSecond = 1000
+
+millisecondsPerMinute : Int
+millisecondsPerMinute = millisecondsPerSecond * 60
+
+millisecondsPerHour : Int
+millisecondsPerHour = millisecondsPerMinute * 60
+
+millisecondsPerDay : Int
+millisecondsPerDay = millisecondsPerHour * 24
+
+
 type alias Model =
   { guests: List Guest
   , plusOnes: List PlusOnePair
   , searchString: String
   , rsvpSubmissionStatus: RsvpSubmissionStatus
+  , countdown: Countdown
   }
 
 
@@ -64,8 +95,9 @@ init () =
     , plusOnes = []
     , searchString = ""
     , rsvpSubmissionStatus = NotSubmitted
+    , countdown = { days = 0, hours = 0, minutes = 0, seconds = 0 }
     }
-  , getGuestList
+  , initialCommand
   )
 
 
@@ -78,6 +110,7 @@ type Msg = GuestListLoaded (Result Http.Error GetGuestListReponse)
   | NotAttendingSubmitted
   | RsvpSubmissionResponse (Result Http.Error ())
   | AddAnotherRsvp
+  | Tick Posix
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -105,6 +138,8 @@ update msg model =
           (model, Cmd.none)
     AddAnotherRsvp ->
       (onAddAnotherRsvp model, Cmd.none)
+    Tick currentTime ->
+      (onTick currentTime model , Cmd.none)
 
 
 onGuestListLoaded : GetGuestListReponse -> Model -> Model
@@ -229,11 +264,38 @@ onAddAnotherRsvp model =
     { model | searchString = "", rsvpSubmissionStatus = NotSubmitted, guests = newGuests }
 
 
+onTick : Posix -> Model -> Model
+onTick currentTime model =
+  { model | countdown = countdownFromTime weddingDate currentTime }
+
+
+countdownFromTime : Posix -> Posix -> Countdown
+countdownFromTime endTime currentTime =
+  let
+      currentTimeMs = posixToMillis currentTime
+      endTimeMs = posixToMillis endTime
+      timeDiffMs = endTimeMs - currentTimeMs
+  in
+    if timeDiffMs < 0 then
+      { days = 0, hours = 0, minutes = 0, seconds = 0 }
+    else
+      { days = timeDiffMs // millisecondsPerDay
+      , hours = (modBy millisecondsPerDay timeDiffMs) // millisecondsPerHour
+      , minutes = (modBy millisecondsPerHour timeDiffMs) // millisecondsPerMinute
+      , seconds = (modBy millisecondsPerMinute timeDiffMs) // millisecondsPerSecond
+      }
+
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  Time.every 1000 Tick
+
+
+initialCommand : Cmd Msg
+initialCommand =
+  Cmd.batch [ getGuestList, Task.perform Tick Time.now ]
 
 
 -- VIEW
@@ -242,7 +304,7 @@ view : Model -> Html Msg
 view model =
   div [ class "container-fluid main-container" ]
     [ heroImageView
-    , receptionDetailsView
+    , receptionDetailsView model
     , registryDetailsView
     , rsvpView model
     ]
@@ -261,8 +323,8 @@ heroImageView =
       ]
     ]
 
-receptionDetailsView : Html Msg
-receptionDetailsView =
+receptionDetailsView : Model -> Html Msg
+receptionDetailsView model =
   div [ class "row details-row" ]
     [ div [ class "col-sm-3" ] []
     , div [ class "col-sm-6" ]
@@ -276,11 +338,33 @@ receptionDetailsView =
             , a [ target "_blank", href "https://capitolviewwinery.com/" ] [ text "Capital View Winery" ]
             , text ". Join us for food, wine, and yard games to celebrate our marriage."
             ]
+        , countdownView model.countdown
+        , br [] []
         , a [ href "/#rsvp", id "rsvp-button", class "btn btn-lg" ] [ text "RSVP" ]
         ]
       ]
-    , div [ class "col-sm-3" ] []
+    , div [ class "col-sm-3" ] [ ]
     ]
+
+
+countdownView : Countdown -> Html Msg
+countdownView countdown =
+  div [ id "countdown-container" ]
+    [ countdownComponentView countdown.days "days"
+    , countdownComponentView countdown.hours "hours"
+    , countdownComponentView countdown.minutes "minutes"
+    , countdownComponentView countdown.seconds "seconds"
+    ]
+
+
+countdownComponentView : Int -> String -> Html Msg
+countdownComponentView value unit =
+  div [ class "countdown-component" ]
+    [ span [ class "countdown-value" ] [ text (String.fromInt value) ]
+    , br [] []
+    , span [ class "countdown-unit" ] [ text unit ]
+    ]
+
 
 registryDetailsView : Html Msg
 registryDetailsView =
@@ -294,6 +378,7 @@ registryDetailsView =
       ]
     , div [ class "col-sm-3" ] []
     ]
+
 
 rsvpView : Model -> Html Msg
 rsvpView model =
