@@ -64,6 +64,7 @@ type alias Countdown =
   , seconds: Int
   }
 
+-- 5:00 PM CDT September 21, 2019
 weddingDate : Posix
 weddingDate = millisToPosix 1569103200000
 
