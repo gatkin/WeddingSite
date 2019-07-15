@@ -224,3 +224,15 @@ p {
   background-color: #7e57c2;
   color: white;
 }
+
+#guest-attendance-container {
+  text-align: center;
+}
+
+.guest-attendance-list {
+  padding: 3em;
+}
+
+.guest-attendance-table {
+  margin-top: 1em;
+}

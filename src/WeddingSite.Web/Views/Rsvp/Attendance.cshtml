@@ -1,0 +1,30 @@
+@model WeddingSite.Models.AttendanceViewModel
+
+<div id="guest-attendance-container" class="container-fluid">
+    @foreach (var guestsByStatus in Model.GuestsByStatuses)
+    {
+        @if(guestsByStatus.GuestNames.Count() > 0)
+        {
+            <div class="row">
+                <div class="col-12 guest-attendance-list">
+                    <h2>@guestsByStatus.Status</h2>
+                    <table class="table table-striped guest-attendance-table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var guest in guestsByStatus.GuestNames)
+                            {
+                                <tr>
+                                    <td>@guest</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
+    </div>

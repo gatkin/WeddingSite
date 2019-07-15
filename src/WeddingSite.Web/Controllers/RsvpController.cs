@@ -40,6 +40,24 @@ namespace WeddingSite.Controllers
             };
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Attendance()
+        {
+            var guests = await GuestService.GetAllGuestsAsync();
+
+            var viewModel = new AttendanceViewModel
+            {
+                GuestsByStatuses = new []
+                {
+                    GetGuestsByStatus(guests, GuestStatus.Attending, "Attending Guests"),
+                    GetGuestsByStatus(guests, GuestStatus.NotAttending, "Non-Attending Guests"),
+                    GetGuestsByStatus(guests, GuestStatus.Unregistered, "Unregistered Guests"),
+                }
+            };
+
+            return View(viewModel);
+        }
+
         [HttpPost]
         public async Task<ActionResult> Attendance([FromBody]AttendanceRequest request)
         {
@@ -51,9 +69,37 @@ namespace WeddingSite.Controllers
             return Ok();
         }
 
+        private static string GetFirstName(string fullName)
+        {
+            return fullName.Split(" ").First();
+        }
+
         private static string GetGuestNameById(IEnumerable<Guest> guests, string id)
         {
             return guests.Single(guest => guest.Id == id).Name;
+        }
+
+        private static GuestsByStatus GetGuestsByStatus(
+            IEnumerable<Guest> guests,
+            string status,
+            string statusDisplayText
+        )
+        {
+            var guestsByStatus = from guest in guests
+                where guest.Status == status
+                orderby GetLastName(guest.Name), GetFirstName(guest.Name)
+                select guest.Name;
+            
+            return new GuestsByStatus
+            {
+                Status = statusDisplayText,
+                GuestNames = guestsByStatus.ToList(),
+            };
+        }
+
+        private static string GetLastName(string fullName)
+        {
+            return fullName.Split(" ").ElementAtOrDefault(1) ?? fullName;
         }
     }
 }
