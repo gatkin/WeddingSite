@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Rewrite;
 using WeddingSite.Core;
+using WeddingSite.Middleware;
 
 namespace WeddingSite
 {
@@ -51,6 +53,11 @@ namespace WeddingSite
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            var rewriteOptions = new RewriteOptions()
+                .Add(RedirectHerokuRequests.ToHttps);
+            
+            app.UseRewriter(rewriteOptions);
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
