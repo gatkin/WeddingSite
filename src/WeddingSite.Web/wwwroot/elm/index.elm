@@ -315,7 +315,7 @@ heroImageView : Html Msg
 heroImageView =
   div [ class "row" ]
     [ div [ id "hero-image-col", class "col-12" ]
-      [ img [ id "hero-image", src "images/Hero.webp" ] []
+      [ img [ id "hero-image", src "images/Hero.jpg" ] []
       , div [ id "image-text" ]
         [ h1 [ id "image-title" ] [ text "McKay & Greg" ]
         , h3 [ id "image-date" ] [ text "September 21, 2019" ]
