@@ -55,7 +55,8 @@ namespace WeddingSite
             }
 
             var rewriteOptions = new RewriteOptions()
-                .Add(RedirectHerokuRequests.ToHttps);
+                .Add(RedirectHerokuRequests.ToHttps)
+                .AddRedirectToWwwPermanent();
             
             app.UseRewriter(rewriteOptions);
 
